@@ -4,8 +4,12 @@ This kit provides a lightweight pipeline for downloading videos, uploading them
  to Bunny.net Stream and publishing posts on WordPress.
 
 ## Setup
-Run `./setup.sh` once to install the required packages (Python modules and
-ffmpeg).
+On **Linux/macOS** run `./setup.sh` once to install the required Python
+packages (which include `python-dotenv`) and `ffmpeg`.
+
+On **Windows** install the Python dependencies manually with
+`pip install -r requirements.txt` (make sure `python-dotenv` is included) and
+download and install `ffmpeg` separately, adding it to your `PATH`.
 
 ## Workflow
 1. Add your links and titles to `upload.txt` (`url - My Title` per line).
