@@ -34,7 +34,7 @@ from tqdm import tqdm
 API_KEY_DEFAULT = os.getenv("BUNNY_API_KEY")
 LIB_ID_DEFAULT = os.getenv("BUNNY_LIBRARY_ID")
 
-BASE_URL = "https://video.bunnycdn.com"
+BASE_URL = os.getenv("BUNNY_BASE_URL", "https://api.bunny.net")
 EMBED_PATTERN = "https://iframe.mediadelivery.net/embed/{lib}/{vid}"
 
 # ——————————————————————————— helper functions ——————————————————————————
