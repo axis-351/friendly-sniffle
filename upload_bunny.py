@@ -20,9 +20,38 @@ import sys
 from pathlib import Path
 from typing import Dict, List
 
-from dotenv import load_dotenv
+from dotenv import dotenv_values, find_dotenv
+import logging
 
-load_dotenv()
+
+def _load_env() -> dict:
+    env_file = find_dotenv(usecwd=True)
+    if not env_file:
+        return {}
+    logger = logging.getLogger("dotenv.main")
+    msgs: list[logging.LogRecord] = []
+
+    class _Handler(logging.Handler):
+        def emit(self, record: logging.LogRecord) -> None:
+            msgs.append(record)
+
+    handler = _Handler()
+    logger.addHandler(handler)
+    try:
+        values = dotenv_values(env_file)
+    except Exception as e:  # pragma: no cover - just in case
+        logger.removeHandler(handler)
+        sys.exit(f"Failed to parse .env – {e}")
+    logger.removeHandler(handler)
+    if msgs or not values:
+        line = msgs[0].args[0] if msgs else "unknown"
+        sys.exit(
+            f"Failed to parse .env – check for stray spaces or quotes on line {line}."
+        )
+    return {k: v for k, v in values.items() if v is not None}
+
+
+ENV = _load_env()
 
 import requests
 from tenacity import retry, stop_after_attempt, wait_fixed, wait_random_exponential
@@ -31,10 +60,10 @@ from tqdm import tqdm
 # ————————————————————————————————————————————————————————————————
 # Credentials supplied via env vars if not passed as flags
 # ————————————————————————————————————————————————————————————————
-API_KEY_DEFAULT = os.getenv("BUNNY_API_KEY")
-LIB_ID_DEFAULT = os.getenv("BUNNY_LIBRARY_ID")
+API_KEY_DEFAULT = os.getenv("BUNNY_API_KEY") or ENV.get("BUNNY_API_KEY")
+LIB_ID_DEFAULT = os.getenv("BUNNY_LIBRARY_ID") or ENV.get("BUNNY_LIBRARY_ID")
 
-BASE_URL = os.getenv("BUNNY_BASE_URL", "https://api.bunny.net")
+BASE_URL = os.getenv("BUNNY_BASE_URL") or ENV.get("BUNNY_BASE_URL") or "https://api.bunny.net"
 EMBED_PATTERN = "https://iframe.mediadelivery.net/embed/{lib}/{vid}"
 
 # ——————————————————————————— helper functions ——————————————————————————
