@@ -31,16 +31,44 @@ import sys
 from pathlib import Path
 from typing import List
 
-from dotenv import load_dotenv
+from dotenv import dotenv_values, find_dotenv
+import logging
 import requests
 from tenacity import retry, stop_after_attempt, wait_random_exponential
 from tqdm import tqdm
 
-load_dotenv()
+def _load_env() -> dict:
+    env_file = find_dotenv(usecwd=True)
+    if not env_file:
+        return {}
+    logger = logging.getLogger("dotenv.main")
+    msgs: list[logging.LogRecord] = []
+
+    class _Handler(logging.Handler):
+        def emit(self, record: logging.LogRecord) -> None:
+            msgs.append(record)
+
+    handler = _Handler()
+    logger.addHandler(handler)
+    try:
+        values = dotenv_values(env_file)
+    except Exception as e:  # pragma: no cover - just in case
+        logger.removeHandler(handler)
+        sys.exit(f"Failed to parse .env – {e}")
+    logger.removeHandler(handler)
+    if msgs or not values:
+        line = msgs[0].args[0] if msgs else "unknown"
+        sys.exit(
+            f"Failed to parse .env – check for stray spaces or quotes on line {line}."
+        )
+    return {k: v for k, v in values.items() if v is not None}
+
+
+ENV = _load_env()
 
 # --- default credentials from environment ------------------------------------
-DEFAULT_USER = os.getenv("WP_USER")
-DEFAULT_PW = os.getenv("WP_APP_PW")
+DEFAULT_USER = os.getenv("WP_USER") or ENV.get("WP_USER")
+DEFAULT_PW = os.getenv("WP_APP_PW") or ENV.get("WP_APP_PW")
 
 # -----------------------------------------------------------------------------
 

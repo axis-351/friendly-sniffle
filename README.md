@@ -45,3 +45,14 @@ read these variables:
 
 A small `run_all.sh` shell script is also included for Unix systems, but
 `master.py` works on Windows and Linux alike.
+
+### Troubleshooting `.env` files
+
+If your `.env` contains stray spaces or quotes, the scripts will stop with a
+message like:
+
+```
+Failed to parse .env – check for stray spaces or quotes on line X.
+```
+
+Fix the indicated line so each entry follows the `KEY=value` format.
