@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 """
-Phase‑3: WordPress autoposter (credentials baked‑in)
-===================================================
+Phase‑3: WordPress autoposter
+=============================
 
-**Caution ⚠️** – This version contains hard‑coded credentials:
-```
-user      : president
-app pass  : Hfml QHH5 kmZt q2tM bAPH 2TRH
-```
-Keep the file private.
+Publishes Bunny.net embed codes to a WordPress site. Credentials are
+provided via command‑line flags or the ``WP_USER`` and ``WP_APP_PW``
+environment variables.
 
 Pipeline
 --------
@@ -38,9 +35,9 @@ import requests
 from tenacity import retry, stop_after_attempt, wait_random_exponential
 from tqdm import tqdm
 
-# --- baked‑in WP credentials -------------------------------------------------
-DEFAULT_USER = "president"
-DEFAULT_PW = "Hfml QHH5 kmZt q2tM bAPH 2TRH"
+# --- default credentials from environment ------------------------------------
+DEFAULT_USER = os.getenv("WP_USER")
+DEFAULT_PW = os.getenv("WP_APP_PW")
 
 # -----------------------------------------------------------------------------
 
@@ -96,10 +93,13 @@ def main():
     ap.add_argument("--status", default="publish", help="Post status: publish|draft|private")
     ap.add_argument("--width", type=int, default=640, help="Iframe width")
     ap.add_argument("--height", type=int, default=360, help="Iframe height")
-    # allow override of baked‑in creds
-    ap.add_argument("--user", default=os.getenv("WP_USER", DEFAULT_USER))
-    ap.add_argument("--password", default=os.getenv("WP_APP_PW", DEFAULT_PW))
+    # allow override of env credentials
+    ap.add_argument("--user", default=DEFAULT_USER, help="WordPress username [env WP_USER]")
+    ap.add_argument("--password", default=DEFAULT_PW, help="WordPress application password [env WP_APP_PW]")
     args = ap.parse_args()
+
+    if not args.user or not args.password:
+        sys.exit("WordPress credentials required. Use flags or set WP_USER and WP_APP_PW.")
 
     auth = auth_header(args.user, args.password)
 
