@@ -34,7 +34,8 @@ your `.env` file if needed.
 
 A `.env.example` file is provided as a template. Copy it to `.env` and add your
 keys there. Each line must be written as `KEY=value` with no extra spaces or
-quotes (for example: `WP_SITE=https://example.com`). The scripts automatically
+quotes (for example: `WP_SITE=https://example.com`). This example file
+illustrates the required formats for each variable. The scripts automatically
 load this file (via [`python-dotenv`](https://github.com/theskumar/python-dotenv)) and
 read these variables:
 - `BUNNY_API_KEY` and `BUNNY_LIBRARY_ID`
