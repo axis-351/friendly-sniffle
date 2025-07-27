@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
-upload_bunny.py — Phase‑2 uploader (Bunny creds baked‑in)
-========================================================
-Uploads every `*.mp4` + thumbnail pair from the *downloads/* directory to your
-Bunny Stream library **473187** using API key **e579d849‑3a35‑4e40‑bda011272190‑2ddc‑4d6f**.
+upload_bunny.py — Phase 2 uploader
+=================================
 
-Override values with flags or env vars if you ever need a different account.
+Uploads every ``*.mp4`` and matching thumbnail from the ``downloads/``
+directory to a Bunny.net Stream library. Credentials must be supplied via
+command‑line flags or the ``BUNNY_API_KEY``/``BUNNY_LIBRARY_ID`` environment
+variables.
 
-Dependencies: `pip install requests tenacity tqdm`
+Dependencies: ``pip install requests tenacity tqdm``
 """
 from __future__ import annotations
 
@@ -24,10 +25,10 @@ from tenacity import retry, stop_after_attempt, wait_fixed, wait_random_exponent
 from tqdm import tqdm
 
 # ————————————————————————————————————————————————————————————————
-# Default credentials (can be overridden by flags or env vars)
+# Credentials supplied via env vars if not passed as flags
 # ————————————————————————————————————————————————————————————————
-API_KEY_DEFAULT = "e579d849-3a35-4e40-bda011272190-2ddc-4d6f"
-LIB_ID_DEFAULT  = 473187
+API_KEY_DEFAULT = os.getenv("BUNNY_API_KEY")
+LIB_ID_DEFAULT = os.getenv("BUNNY_LIBRARY_ID")
 
 BASE_URL = "https://video.bunnycdn.com"
 EMBED_PATTERN = "https://iframe.mediadelivery.net/embed/{lib}/{vid}"
@@ -90,10 +91,14 @@ def main():
     ap = argparse.ArgumentParser(description="Upload MP4s to Bunny Stream & collect embed links")
     ap.add_argument("--dir", default="downloads", help="Directory with MP4/JPG pairs [downloads]")
     ap.add_argument("--workers", type=int, default=4, help="Parallel uploads")
-    ap.add_argument("--api-key", default=os.getenv("BUNNY_API_KEY", API_KEY_DEFAULT))
-    ap.add_argument("--library", type=int, default=int(os.getenv("BUNNY_LIBRARY_ID", str(LIB_ID_DEFAULT))))
+    ap.add_argument("--api-key", default=API_KEY_DEFAULT, help="Bunny API key [env BUNNY_API_KEY]")
+    ap.add_argument("--library", type=int, default=int(LIB_ID_DEFAULT) if LIB_ID_DEFAULT else None,
+                    help="Bunny library ID [env BUNNY_LIBRARY_ID]")
     ap.add_argument("--out", default="bunny_results.json", help="JSON summary file")
     args = ap.parse_args()
+
+    if not args.api_key or args.library is None:
+        sys.exit("Bunny API key and library ID are required. Use flags or set BUNNY_API_KEY and BUNNY_LIBRARY_ID.")
 
     mp4_files = sorted(Path(args.dir).glob("*.mp4"))
     if not mp4_files:
