@@ -20,6 +20,10 @@ import sys
 from pathlib import Path
 from typing import Dict, List
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 import requests
 from tenacity import retry, stop_after_attempt, wait_fixed, wait_random_exponential
 from tqdm import tqdm

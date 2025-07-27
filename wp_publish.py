@@ -31,9 +31,12 @@ import sys
 from pathlib import Path
 from typing import List
 
+from dotenv import load_dotenv
 import requests
 from tenacity import retry, stop_after_attempt, wait_random_exponential
 from tqdm import tqdm
+
+load_dotenv()
 
 # --- default credentials from environment ------------------------------------
 DEFAULT_USER = os.getenv("WP_USER")

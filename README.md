@@ -23,7 +23,8 @@ python wp_publish.py --site https://example.com
 ```
 
 A `.env.example` file is provided as a template. Copy it to `.env` and add your
-keys there. The scripts read these variables:
+keys there. The scripts automatically load this file (via `python-dotenv`) and
+read these variables:
 - `BUNNY_API_KEY` and `BUNNY_LIBRARY_ID`
 - `WP_USER` and `WP_APP_PW`
 - `WP_SITE` (used by `master.py` and `run_all.sh`)
