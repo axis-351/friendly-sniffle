@@ -119,7 +119,7 @@ def main():
     for rec in tqdm(ok_records, desc="Posting to WP"):
         title = rec["title"]
         embed = rec["embed_url"]
-        thumb_path = Path(rec["thumbnail"]) if rec.get("thumbnail") else None
+        thumb_path = Path(rec["thumbnail"]) if "thumbnail" in rec else None
         try:
             media_id = upload_media(args.site, auth, thumb_path) if thumb_path and thumb_path.exists() else 0
             content = make_iframe(embed, args.width, args.height)

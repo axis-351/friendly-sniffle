@@ -26,6 +26,9 @@ python wp_publish.py --site https://example.com
 ./cleanup.sh
 ```
 
+Running `upload_bunny.py` creates `bunny_results.json` containing the embed URL
+for each video and, when available, the local path to the thumbnail image.
+
 A `.env.example` file is provided as a template. Copy it to `.env` and add your
 keys there. Each line must be written as `KEY=value` with no extra spaces or
 quotes (for example: `WP_SITE=https://example.com`). The scripts automatically

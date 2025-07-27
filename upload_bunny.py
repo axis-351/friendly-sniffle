@@ -82,8 +82,14 @@ def process(idx: int, mp4: Path, jpg: Path | None, key: str, lib: int, results: 
         upload_binary(key, lib, vid, mp4)
         if jpg and jpg.exists():
             set_thumb(key, lib, vid, jpg)
+            thumb = str(jpg)
+        else:
+            thumb = None
         embed = EMBED_PATTERN.format(lib=lib, vid=vid)
-        results.append({"title": title, "video_id": vid, "embed_url": embed, "status": "ok"})
+        rec = {"title": title, "video_id": vid, "embed_url": embed, "status": "ok"}
+        if thumb:
+            rec["thumbnail"] = thumb
+        results.append(rec)
         print(f"[OK] {idx}: {title} -> {vid}")
     except Exception as e:
         results.append({"title": title, "status": "error", "error": str(e)})
